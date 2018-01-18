@@ -1,0 +1,19 @@
+{
+  "name": "insanelyexpensive-api",
+  "version": "1.0.0",
+  "description": "IE API",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js"
+  },
+  "author": "Roy Peckham",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.1",
+    "express": "^4.15.4",
+    "mysql": "^2.15.0"    
+  },
+  "devDependencies": {
+    "nodemon": "^1.12.1"
+  }
+}
