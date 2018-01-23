@@ -33,9 +33,9 @@ module.exports = function(app, db){
         })             
     });
 
-    app.get('/google-region/:term', (req, result) => { 
+    app.get('/google-autocomplete/:term', (req, result) => { 
         const term_ = req.params.term;
-        googleTrends.interestByRegion({keyword: term_})
+        googleTrends.autoComplete({keyword: term_})
         .then((res) => {
             result.send(res);
         })
@@ -105,7 +105,10 @@ module.exports = function(app, db){
 
 
     app.get('/name', function (req, res) { 
-        let sql = "SELECT * FROM `names` WHERE name = '" + req.query.n + "' AND gender = '" + req.query.g + "'";
+        //let sql = "SELECT * FROM `names` WHERE name = '" + req.query.n + "' AND gender = '" + req.query.g + "'";
+        console.log("HI");
+        let sql = "SELECT * FROM `names` WHERE name = '" + req.query.n + "' ORDER BY occurrences DESC";
+        console.log(sql);
         let query = db.query(sql, (err, results) => {
             if(err) throw err;
             res.send(results);
