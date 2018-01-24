@@ -115,4 +115,18 @@ module.exports = function(app, db){
         });        
     });
 
+
+    app.get('/variations/:name', function (req, res) { 
+        let name_ = req.params.name;
+        if(name_.length > 4){
+            name_ = name_.substring(0, name_.length - 2); 
+        }
+        let sql = "SELECT DISTINCT name FROM `names` WHERE name LIKE '" + name_ + "%' ORDER BY occurrences DESC LIMIT 10";
+        console.log(sql);
+        let query = db.query(sql, (err, results) => {
+            if(err) throw err;
+            res.send(results);
+        });        
+    });    
+
 }
