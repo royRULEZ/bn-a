@@ -129,4 +129,14 @@ module.exports = function(app, db){
         });        
     });    
 
+    app.get('/history/:name', function (req, res) { 
+        let name_ = req.params.name;
+        let sql = "SELECT * FROM `names_history` WHERE name = '" + name_ + "' ORDER BY year ASC";
+        console.log(sql);
+        let query = db.query(sql, (err, results) => {
+            if(err) throw err;
+            res.send(results);
+        });        
+    });      
+
 }
