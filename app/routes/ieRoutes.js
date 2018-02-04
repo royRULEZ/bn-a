@@ -94,13 +94,21 @@ module.exports = function(app, db){
             }
         }
 
+        let sqlCount = 'SELECT COUNT(name) AS numNames FROM `names` WHERE '+where_str;
+        let sqlCount_val = 0;
+        //console.log(sqlCount);
+        let queryCount = db.query(sqlCount, (err, resultsCount) => {
+            if(err) throw err;      
+            let sql = 'SELECT name FROM `names` WHERE '+where_str+' LIMIT '+resultsCount[0].numNames;
+            console.log(sql);
+            let query = db.query(sql, (err2, results) => {
+                if(err2) throw err2;
+                res.send(results);
+            }); 
 
-        let sql = 'SELECT name FROM `names` WHERE '+where_str+' LIMIT 200';
-        console.log(sql);
-        let query = db.query(sql, (err, results) => {
-            if(err) throw err;
-            res.send(results);
-        });        
+        });          
+
+       
     });
 
 
