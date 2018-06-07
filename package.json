@@ -11,9 +11,10 @@
   "dependencies": {
     "body-parser": "^1.18.1",
     "express": "^4.15.4",
-    "mysql": "^2.15.0"    
+    "mysql": "^2.15.0"
   },
   "devDependencies": {
+    "google-trends-api": "^4.6.2",
     "nodemon": "^1.12.1"
   }
 }
