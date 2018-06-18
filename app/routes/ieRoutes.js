@@ -60,12 +60,18 @@ module.exports = function(app, db){
         // Build the Query String
         let where_ = [];
         let where_str = "";
+        let page = 1;
+        let offset = 0;
+        let limit = 100;
 
-        console.log("HEY", req.query);
+        console.log("Request Query", req.query);
 
+        if(req.query.page){page=parseInt(req.query.page)}
         if(req.query.g){where_.push("gender = '"+req.query.g+"' ");}
-        if(req.query.a){console.log("YO");where_.push("name LIKE '"+req.query.a+"%' ");}        
+        if(req.query.a){console.log("Alphabet");where_.push("name LIKE '"+req.query.a+"%' ");}        
         if(req.query.l){where_.push("LENGTH(name) = "+req.query.l+" ");}
+
+        console.log("Page Requested", page);
 
         if(req.query.p){
             switch(req.query.p){
@@ -101,8 +107,6 @@ module.exports = function(app, db){
             }
         }
         
-        //where_.push("popularity = '"+req.query.p+"' ");
-        
         for(var i = 0; i < where_.length; i++){
             where_str += where_[i];
             if(where_.length != 1 && i != (where_.length-1)){
@@ -112,14 +116,15 @@ module.exports = function(app, db){
 
         let sqlCount = 'SELECT COUNT(name) AS numNames FROM `names_all` WHERE '+where_str;
         let sqlCount_val = 0;
-        //console.log(sqlCount);
         let queryCount = db.query(sqlCount, (err, resultsCount) => {
             if(err) throw err;      
-            let sql = 'SELECT name FROM `names_all` WHERE '+where_str+' LIMIT 1000'; //LIMIT '+resultsCount[0].numNames
-            console.log(sql);
+            console.log("Number of Pages", Math.ceil(resultsCount[0].numNames/limit)); 
+            offset = limit * (page - 1);
+            let sql = 'SELECT name FROM `names_all` WHERE '+where_str+' LIMIT '+limit+' OFFSET '+offset+''; //LIMIT '+resultsCount[0].numNames
+            console.log("Query: ", sql);
             let query = db.query(sql, (err2, results) => {
                 if(err2) throw err2;
-                res.send(results);
+                res.send({pagecount: Math.ceil(resultsCount[0].numNames/limit), allnames: results});
             }); 
 
         });          
@@ -204,6 +209,18 @@ module.exports = function(app, db){
         });        
     }); 
 
+    app.get('/get-collections/:name', function (req, res) { 
+        let name_ = req.params.name;
+        //let sql = "SELECT origin FROM `origin` WHERE name = '" + name_ + "'";
+        //let sql = "SELECT collection.name, collection.url FROM collection INNER JOIN collection_profiles ON collection_profiles.collection_id=collection.id WHERE collection_profiles.firstname = '" + name_ + "' AND collection.type != 'origin'";
+        let sql = "SELECT collection.id, collection.name, collection.url FROM collection INNER JOIN collection_profiles ON collection_profiles.collection_id=collection.id WHERE collection_profiles.firstname = '" + name_ + "' AND collection.type != 'origin' UNION SELECT collection.id, collection.name, collection.url FROM collection INNER JOIN collection_names ON collection_names.collection_id=collection.id WHERE collection_names.name = '" + name_ + "' AND collection.type != 'origin'";
+        console.log(sql);
+        let query = db.query(sql, (err, results) => {
+            if(err) throw err;
+            res.send(results);
+        });        
+    }); 
+
     app.get('/collection/:name', function (req, res) { 
         let name_ = req.params.name;
         let sql = "SELECT * FROM `collection` WHERE url = '" + name_ + "'";
@@ -227,6 +244,26 @@ module.exports = function(app, db){
     app.get('/collection-profiles/:id', function (req, res) { 
         let id_ = req.params.id;
         let sql = "SELECT * FROM `collection_profiles` WHERE collection_id = " + id_ + " ORDER BY sequence ASC";
+        console.log(sql);
+        let query = db.query(sql, (err, results) => {
+            if(err) throw err;
+            res.send(results);
+        });        
+    }); 
+
+    app.get('/collection-featured', function (req, res) { 
+        let id_ = req.params.id;
+        let sql = "SELECT * FROM `collection` WHERE featured != 0 ORDER BY featured ASC";
+        console.log(sql);
+        let query = db.query(sql, (err, results) => {
+            if(err) throw err;
+            res.send(results);
+        });        
+    }); 
+
+    app.get('/collections', function (req, res) { 
+        let id_ = req.params.id;
+        let sql = "SELECT name, url FROM `collection` WHERE type != 'origin' ORDER BY name ASC";
         console.log(sql);
         let query = db.query(sql, (err, results) => {
             if(err) throw err;
