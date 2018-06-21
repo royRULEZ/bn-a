@@ -1,5 +1,6 @@
 //var ObjectID = require('mongodb').ObjectID;
 const googleTrends  = require('google-trends-api');
+const axios = require('axios');
 
 module.exports = function(app, db){
 
@@ -29,6 +30,51 @@ module.exports = function(app, db){
             res.send(results);
         });        
     }); 
+
+    app.get('/wikipedia/:term', (req, result) => { 
+        const term_ = req.params.term;
+
+        axios.get('https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch='+term_+'&format=json')
+          .then(response => {
+            console.log(response.data);
+            result.send(response.data.query.search);
+          })
+          .catch(error => {
+            console.log(error);
+          });
+
+    });
+    
+    app.get('/meaning/:term', (req, result) => { 
+        const term_ = req.params.term;
+
+        axios.get('https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch='+term_+'&format=json')
+          .then(response => {
+            console.log(response.data);
+            result.send(response.data.query.search[0].snippet);
+          })
+          .catch(error => {
+            console.log(error);
+          });
+
+    });
+
+    app.get('/imdb/:term', (req, result) => { 
+        const term_ = req.params.term;
+
+        axios.get('https://v2.sg.media-imdb.com/suggests/'+term_[0].toLowerCase()+'/'+term_.toLowerCase()+'.json')
+          .then(response => {
+            let string = response.data;
+            string = string.substr(6+term_.length);
+            string = string.slice(0, -1);
+            result.send(string);
+
+          })
+          .catch(error => {
+            console.log(error);
+          });
+
+    });
 
     app.get('/google-trends/:term', (req, result) => { 
         const term_ = req.params.term;
@@ -262,8 +308,26 @@ module.exports = function(app, db){
     }); 
 
     app.get('/collections', function (req, res) { 
-        let id_ = req.params.id;
         let sql = "SELECT name, url FROM `collection` WHERE type != 'origin' ORDER BY name ASC";
+        console.log(sql);
+        let query = db.query(sql, (err, results) => {
+            if(err) throw err;
+            res.send(results);
+        });        
+    }); 
+
+    app.get('/collections/:char', function (req, res) { 
+        let char_ = req.params.char;
+        let sql = "SELECT name, url FROM `collection` WHERE type != 'origin' AND name LIKE '"+char_+"%' ORDER BY name ASC";
+        console.log(sql);
+        let query = db.query(sql, (err, results) => {
+            if(err) throw err;
+            res.send(results);
+        });        
+    }); 
+
+    app.get('/collections-popular', function (req, res) { 
+        let sql = "SELECT id, name, url FROM `collection` WHERE type != 'origin' ORDER BY name ASC LIMIT 8";
         console.log(sql);
         let query = db.query(sql, (err, results) => {
             if(err) throw err;

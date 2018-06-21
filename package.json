@@ -9,6 +9,7 @@
   "author": "Roy Peckham",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.18.0",
     "body-parser": "^1.18.1",
     "express": "^4.15.4",
     "mysql": "^2.15.0"
