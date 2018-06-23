@@ -23,7 +23,8 @@ module.exports = function(app, db){
     });   
 
     app.get('/random-name', function (req, res) {
-        let random_num = (Math.floor(Math.random() * 50)) + 100;
+        let random_num = (Math.floor(Math.random() * 250)) + 100;
+        console.log("-----", random_num);
         let sql = 'SELECT name, gender, `2017`, `2016`, `2015`, `2014`, `2013`, `2012`, `2011` FROM `names_all` WHERE rank_2017 > '+ random_num +' LIMIT 1';
         let query = db.query(sql, (err, results) => {
             if(err) throw err;
@@ -328,6 +329,15 @@ module.exports = function(app, db){
 
     app.get('/collections-popular', function (req, res) { 
         let sql = "SELECT id, name, url FROM `collection` WHERE type != 'origin' ORDER BY name ASC LIMIT 8";
+        console.log(sql);
+        let query = db.query(sql, (err, results) => {
+            if(err) throw err;
+            res.send(results);
+        });        
+    }); 
+
+    app.get('/ad-cluster', function (req, res) { 
+        let sql = "SELECT * FROM `affiliate` WHERE featured = 1";
         console.log(sql);
         let query = db.query(sql, (err, results) => {
             if(err) throw err;
