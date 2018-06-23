@@ -3,12 +3,22 @@ const mysql         = require('mysql');
 const bodyParser    = require('body-parser');
 
 // Create connection
+
 var db = mysql.createConnection({
     host     : 'localhost',
     user     : 'root',
     //password : 'dbrootpassword',
     database : 'babynamr'
 });
+
+/*
+var db = mysql.createConnection({
+    host     : 'babynamr.cr4av4qzyikx.us-east-2.rds.amazonaws.com',
+    user     : 'babynamrUser',
+    password : 'babynamrPASSW0RD',
+    database : 'babynamr'
+});
+*/
 
 const app           = express();
 const port          = 8088;
